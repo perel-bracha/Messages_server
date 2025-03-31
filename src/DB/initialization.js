@@ -1,0 +1,43 @@
+const conDB = require("./connectToDB");
+
+async function initializeDB() {
+  const insertStudy_years = `INSERT INTO study_years (study_year_name) VALUES ('כללי'), ('א'), ('ב'), ('ג');`;
+
+  const insertMajors = `INSERT INTO majors (major_name) VALUES
+('כללי'),
+('אמנות'),
+('אנגלית'),
+('גרפיקה'),
+('מחנכות'),
+('חינוך מיוחד'),
+('יעוץ מס'),
+('מחשבים'),
+('מחשבים מתוגבר'),
+('מתמטיקה'),`;
+
+  const insertBackgrounds = `INSERT INTO backgrounds (background_name) VALUES`;
+
+  const files = fs.readdirSync(backgroundsDir);
+  for (const file of files) {
+    const imagePath = `/public/backgrounds/${file}`;
+    const imageName = path.basename(file, path.extname(file)); // שם הקובץ בלי הסיומת
+
+    await connection.execute(
+      "INSERT INTO background_images (image_name, image_path) VALUES (?, ?) ON DUPLICATE KEY UPDATE image_path = VALUES(image_path)",
+      [imageName, imagePath]
+    );
+  }
+  console.log("Initial backgrounds inserted");
+  
+  await conDB.promise().query(insertApartments);
+  console.log("Initial apartments inserted");
+
+  await conDB.promise().query(insertUsers);
+  console.log("Initial users inserted");
+
+  // await conDB.promise().query(insertDonations);
+  // console.log("Initial donations inserted");
+}
+
+initializeDB();
+module.exports = initializeDB;
