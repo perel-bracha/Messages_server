@@ -19,7 +19,7 @@ async function initializeDB() {
 ('מחשבים מתוגבר'),
 ('מתמטיקה')`;
 
-  const insertBackgrounds = `INSERT INTO backgrounds (background_name) VALUES`;
+  // const insertBackgrounds = `INSERT INTO backgrounds (background_name) VALUES`;
 
   const files = fs.readdirSync(backgroundsDir);
   for (const file of files) {
@@ -27,7 +27,7 @@ async function initializeDB() {
     const imageName = path.basename(file, path.extname(file)); // שם הקובץ בלי הסיומת
 
     await conDB.execute(
-      "INSERT INTO background_images (image_name, image_path) VALUES (?, ?) ON DUPLICATE KEY UPDATE image_path = VALUES(image_path)",
+      "INSERT INTO backgrounds (background_name, background_path) VALUES (?, ?) ON DUPLICATE KEY UPDATE background_path = VALUES(background_path)",
       [imageName, imagePath]
     );
   }
