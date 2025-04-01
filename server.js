@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const socketIo = require("socket.io");
+const { log } = require("console");
 
 const app = express();
 const server = http.createServer(app);
@@ -14,8 +15,9 @@ app.use(express.json()); // מאפשר שליחת JSON בבקשות
 app.use("/backgrounds", express.static("public/backgrounds"));
 
 app.use("/backgrounds", require("./src/API/backgrounds.routes"));
-// app.use("/majors", require("./src/API/apartments.routes"));
-app.use("/messages", require("./src/API/donations.routes"));//(io)
+app.use("/majors", require("./src/API/majors.routes"));
+app.use("/study_years", require("./src/API/study_years.routes"));
+// app.use("/messages", require("./src/API/donations.routes"));//(io)
 
 io.on("connection", (socket) => {
   console.log(`לקוח מחובר ${socket.id}`);
@@ -24,6 +26,8 @@ io.on("connection", (socket) => {
   });
 });
 app.get("", (req, res) => {
+  console.log("server is running");
+  
   return res.status(200).json("messages server");
 });
 
