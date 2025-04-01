@@ -7,6 +7,6 @@ CREATE TABLE messages (
     message_text VARCHAR(1000),
     image_path VARCHAR(255) NULL,
     background_id INT NOT NULL,
-    FOREIGN KEY (major_id) REFERENCES major(major_id),
+    FOREIGN KEY (major_id) REFERENCES majors(major_id),
     FOREIGN KEY (study_year_id) REFERENCES study_years(study_year_id)
 );
