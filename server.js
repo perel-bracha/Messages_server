@@ -33,5 +33,5 @@ app.get("", (req, res) => {
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
-  console.log(`Server is running on messagesserver-production.up.railway.app`);//http://localhost:${PORT}
+  console.log(`Server is running on https://messagesserver-production.up.railway.app`);//http://localhost:${PORT}
 });
