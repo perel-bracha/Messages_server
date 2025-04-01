@@ -1,4 +1,8 @@
 const conDB = require("./connectToDB");
+const fs = require("fs");
+const path = require("path");
+const { pool } = require("./db");
+const backgroundsDir = path.join(__dirname, "../../public/backgrounds"); // Define the directory path
 
 async function initializeDB() {
   const insertStudy_years = `INSERT INTO study_years (study_year_name) VALUES ('כללי'), ('א'), ('ב'), ('ג');`;
@@ -13,7 +17,7 @@ async function initializeDB() {
 ('יעוץ מס'),
 ('מחשבים'),
 ('מחשבים מתוגבר'),
-('מתמטיקה'),`;
+('מתמטיקה')`;
 
   const insertBackgrounds = `INSERT INTO backgrounds (background_name) VALUES`;
 
@@ -22,21 +26,20 @@ async function initializeDB() {
     const imagePath = `/public/backgrounds/${file}`;
     const imageName = path.basename(file, path.extname(file)); // שם הקובץ בלי הסיומת
 
-    await connection.execute(
+    await conDB.execute(
       "INSERT INTO background_images (image_name, image_path) VALUES (?, ?) ON DUPLICATE KEY UPDATE image_path = VALUES(image_path)",
       [imageName, imagePath]
     );
   }
   console.log("Initial backgrounds inserted");
   
-  await conDB.promise().query(insertApartments);
-  console.log("Initial apartments inserted");
+  await conDB.promise().query(insertStudy_years);
+  console.log("Initial study_years inserted");
 
-  await conDB.promise().query(insertUsers);
-  console.log("Initial users inserted");
+  await conDB.promise().query(insertMajors);
+  console.log("Initial majots inserted");
 
-  // await conDB.promise().query(insertDonations);
-  // console.log("Initial donations inserted");
+  
 }
 
 initializeDB();
