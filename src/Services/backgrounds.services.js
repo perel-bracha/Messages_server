@@ -1,35 +1,23 @@
 const pool = require("../DB/db");
 const fs = require("fs");
 const path = require("path");
+const PORT = process.env.PORT || 8080;
 
 const getAllBackgrounds = async () => {
   try {
     const [backgrounds] = await pool.execute(`SELECT * FROM backgrounds`);
 
-    return backgrounds.map((bg) => {
-      const imagePath = path.join(__dirname, "public", bg.background_path);
-      let base64Image = null;
-      try {
-        const imageBuffer = fs.readFileSync(imagePath);
-        base64Image = `data:image/jpeg;base64,${imageBuffer.toString(
-          "base64"
-        )}`;
-      } catch (error) {
-        console.error(`❌ שגיאה בקריאת התמונה ${bg.background_path}:`, error);
-      }
-
-      return {
-        background_id: bg.background_id,
-        background_name: bg.background_name,
-        background_url: `http://localhost:3000${bg.background_path}`,
-        background_image: base64Image,
-      };
-    });
+    return backgrounds.map((bg) => ({
+      background_id: bg.background_id,
+      background_name: bg.background_name,
+      background_url: `http://localhost:${PORT}/${bg.background_path}`
+    }));
   } catch (err) {
     console.error("❌ שגיאה בשליפת הרקעים:", err);
     throw new Error("שגיאה בשליפת הרקעים");
   }
 };
+
 
 async function createBackground(background) {
   try {
@@ -111,17 +99,7 @@ module.exports = { getAllBackgrounds };
 //   }
 // });
 
-// // נתיב API לקבלת כל התמונות
-// app.get("/background-images", async (req, res) => {
-//   try {
-//     const [images] = await pool.query("SELECT * FROM background_images");
-//     res.json(images);
-//   } catch (error) {
-//     res.status(500).json({ error: "Database error", details: error });
-//   }
-// });
 
-// app.listen(3000, () => console.log("Server running on port 3000"));
 
 // //gpt client
 // import { useState, useEffect } from "react";
