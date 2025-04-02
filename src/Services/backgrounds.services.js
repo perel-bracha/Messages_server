@@ -10,7 +10,7 @@ const getAllBackgrounds = async () => {
     return backgrounds.map((bg) => ({
       background_id: bg.background_id,
       background_name: bg.background_name,
-      background_url: `http://localhost:${PORT}/${bg.background_path}`
+      background_url: `http://localhost:${PORT}${bg.background_path}`
     }));
   } catch (err) {
     console.error("❌ שגיאה בשליפת הרקעים:", err);
@@ -22,7 +22,7 @@ const getAllBackgrounds = async () => {
 async function createBackground(background) {
   try {
     const result = await pool.query(
-      "INSERT INTO backgrounds (background_name) VALUES ($1) RETURNING *",
+      "INSERT INTO backgrounds (background_name) VALUES (?) RETURNING *",
       [background]
     );
     return result.rows[0];

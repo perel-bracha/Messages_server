@@ -3,7 +3,8 @@ const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const socketIo = require("socket.io");
-const { log } = require("console");
+var path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../../.env") }); // בדיקת טעינת המשתנים הסביבתיים
 
 const app = express();
 const server = http.createServer(app);
@@ -12,12 +13,12 @@ const io = socketIo(server, {
 });
 app.use(cors());
 app.use(express.json()); // מאפשר שליחת JSON בבקשות
-app.use("/backgrounds", express.static("public/backgrounds"));
+app.use("/public/backgrounds", express.static("public/backgrounds"));
 
 app.use("/backgrounds", require("./src/API/backgrounds.routes"));
 app.use("/majors", require("./src/API/majors.routes"));
 app.use("/study_years", require("./src/API/study_years.routes"));
-// app.use("/messages", require("./src/API/donations.routes"));//(io)
+app.use("/messages", require("./src/API/messages.routes"));//(io)
 
 io.on("connection", (socket) => {
   console.log(`לקוח מחובר ${socket.id}`);
@@ -43,6 +44,6 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
   console.log(
-    `Server is running on https://messagesserver-production.up.railway.app`
+    `Server is running on ${process.env.URL}`
   ); //http://localhost:${PORT}
 });
