@@ -17,13 +17,13 @@ const getQuery = `SELECT
     FROM messages m
     LEFT JOIN backgrounds b ON m.background_id = b.background_id
     LEFT JOIN majors mj ON m.major_id = mj.major_id
-    LEFT JOIN study_years sy ON m.study_year_id = sy.study_year_id;`;
+    LEFT JOIN study_years sy ON m.study_year_id = sy.study_year_id`;
 
 //השיטה היא להחזיר נתיב ולגשת
 
 async function getAllMaessages() {
   try {
-    const result = await pool.query(getQuery);
+    const result = await pool.query(`${getQuery} ORDER BY message_date DESC;`);
     return result[0];
   } catch (err) {
     throw err;
@@ -37,7 +37,17 @@ async function getMessageById(id) {
     throw err;
   }
 }
-
+async function getMessagesByMajor(major_id) {
+  try {
+    const result = await pool.query(
+      `${getQuery} WHERE m.major_id = ?`,
+      [major_id]
+    );
+    return result[0];
+  } catch (err) {
+    throw err;
+  }
+}
 async function createMessage(message) {
   try {
     const [result] = await pool.query(
@@ -115,4 +125,5 @@ module.exports = {
   updateMessage,
   deleteMessage,
   exportMessagesToExcel,
+  getMessagesByMajor
 };

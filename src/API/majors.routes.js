@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const majorsService = require("../Services/majors.services");
+const { getMessagesByMajor } = require("../Services/messages.services");
 const router = Router();
 
 router.get("/", async (req, res) => {
@@ -28,11 +29,23 @@ router.get("/:id", async (req, res) => {
 router.get(`/:id/messages`, async (req, res) => {
   try {
     const { id } = req.params;
-    const messages = await majorsService.getMessagesByMajor(id);
+    const messages = await getMessagesByMajor(id);
     if (!messages) {
       return res.status(404).json({ error: "Messages not found" });
     }
     res.json(messages);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+router.get('/screen/:screenNum', async (req, res) => {
+  try {
+    const { screenNum } = req.params;
+    const majors = await majorsService.getScreenMajors(screenNum);
+    if (!majors) {
+      return res.status(404).json({ error: "Majors not found" });
+    }
+    res.json(majors);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

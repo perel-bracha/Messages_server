@@ -11,23 +11,10 @@ async function getAllMajors() {
 
 async function getMajorById(id) {
   try {
-    const result = await pool.query(
-      "SELECT * FROM majors WHERE major_id = ?",
-      [id]
-    );
+    const result = await pool.query("SELECT * FROM majors WHERE major_id = ?", [
+      id,
+    ]);
     return result.rows[0];
-  } catch (err) {
-    throw err;
-  }
-}
-
-async function getMessagesByMajor(major_id) {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM messages WHERE major_id = ?",
-      [major_id]
-    );
-    return result.rows;
   } catch (err) {
     throw err;
   }
@@ -44,9 +31,41 @@ async function createMajor(major) {
     throw err;
   }
 }
+
+async function getScreenMajors(screenNum) {
+  let start;
+  let finish;
+  switch (Number(screenNum)) {
+    case 1:
+      start = 2;
+      finish = 6;
+      break;
+    case 2:
+      start = 7;
+      finish = 10;
+      break;
+    case 3:
+      start = 1;
+      finish = 1;
+      break;
+    default:
+      throw new Error("Invalid screen number");
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM majors WHERE major_id BETWEEN ? AND ?",
+      [start, finish]
+    );
+    return result[0];
+  } catch (err) {
+    throw err;
+  }
+}
+
 module.exports = {
   getAllMajors,
-  getMessagesByMajor,
   getMajorById,
   createMajor,
+  getScreenMajors,
 };
