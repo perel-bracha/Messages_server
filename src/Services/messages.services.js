@@ -22,6 +22,7 @@ const getQuery = `SELECT
 //השיטה היא להחזיר נתיב ולגשת
 
 async function getAllMaessages() {
+  console.log("URL:", process.env.URL);
   try {
     const result = await pool.query(`${getQuery} ORDER BY message_date DESC;`);
     return result[0];
