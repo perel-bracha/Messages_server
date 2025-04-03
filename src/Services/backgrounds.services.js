@@ -1,6 +1,8 @@
 const pool = require("../DB/db");
 const fs = require("fs");
 const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../../.env") }); // בדיקת טעינת המשתנים הסביבתיים
+
 const PORT = process.env.PORT || 8080;
 const URL = process.env.URL || `https://messagesserver-production.up.railway.app`;
 const getAllBackgrounds = async () => {
