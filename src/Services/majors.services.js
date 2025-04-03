@@ -46,7 +46,7 @@ async function getScreenMajors(screenNum) {
       break;
     case 3:
       start = 1;
-      finish = 1;
+      finish = 0;
       break;
     default:
       throw new Error("Invalid screen number");
@@ -54,8 +54,8 @@ async function getScreenMajors(screenNum) {
 
   try {
     const result = await pool.query(
-      "SELECT * FROM majors WHERE major_id BETWEEN ? AND ?",
-      [start, finish]
+      "SELECT * FROM majors ORDER BY major_id LIMIT ? OFFSET ?",
+      [finish - start + 2, start-1]
     );
     return result[0];
   } catch (err) {
