@@ -49,6 +49,17 @@ async function getMessagesByMajor(major_id) {
     throw err;
   }
 }
+async function getMessagesRelevantByMajor(major_id) {
+  try {
+    const result = await pool.query(
+      `${getQuery} WHERE m.major_id = ? AND m.destination_date >= CURDATE()`,
+      [major_id]
+    );
+    return result[0];
+  } catch (err) {
+    throw err;
+  }
+}
 async function createMessage(message) {
   try {
     const [result] = await pool.query(
@@ -126,5 +137,6 @@ module.exports = {
   updateMessage,
   deleteMessage,
   exportMessagesToExcel,
-  getMessagesByMajor
+  getMessagesByMajor,
+  getMessagesRelevantByMajor,
 };
