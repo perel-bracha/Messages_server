@@ -42,7 +42,7 @@ async function getScreenMajors(screenNum) {
       break;
     case 2:
       start = 7;
-      finish = 10;
+      finish = 11;
       break;
     case 3:
       start = 1;
