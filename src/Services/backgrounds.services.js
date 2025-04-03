@@ -2,7 +2,7 @@ const pool = require("../DB/db");
 const fs = require("fs");
 const path = require("path");
 const PORT = process.env.PORT || 8080;
-
+const URL = process.env.URL || `https://messagesserver-production.up.railway.app`;
 const getAllBackgrounds = async () => {
   try {
     const [backgrounds] = await pool.execute(`SELECT * FROM backgrounds`);
