@@ -10,7 +10,7 @@ const getAllBackgrounds = async () => {
     return backgrounds.map((bg) => ({
       background_id: bg.background_id,
       background_name: bg.background_name,
-      background_url: `http://localhost:${PORT}${bg.background_path}`
+      background_url: `${process.env.URL}${bg.background_path}`
     }));
   } catch (err) {
     console.error("❌ שגיאה בשליפת הרקעים:", err);
