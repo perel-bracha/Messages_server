@@ -110,12 +110,22 @@ async function exportMessagesToExcel() {
     // הוספת כותרות לעמודות
     worksheet.columns = [
       { header: "תאריך", key: "message_date", width: 20 },
+      { header: "תאריך עברי", key: "message_date_hebrew", width: 25 },
       { header: "תאריך יעד", key: "destination_date", width: 20 },
+      { header: "תאריך יעד עברי", key: "destination_date_hebrew", width: 25 },
       { header: "שנת לימודים", key: "study_year_name", width: 15 },
       { header: "מגמה", key: "major_name", width: 20 },
       { header: "טקסט", key: "message_text", width: 30 },
       { header: "קובץ", key: "image_url", width: 40 },
     ];
+
+    // הוספת תאריך עברי לכל הודעה
+    messages.forEach((message) => {
+      const destinationDate = new Date(message.destination_date);
+      const messageDate = new Date(message.message_date);
+      message.destination_date_hebrew = toHebrewDate(destinationDate);
+      message.message_date_hebrew = toHebrewDate(messageDate);
+    });
 
     // הוספת נתונים לשורות
     messages.forEach((message) => {
@@ -129,6 +139,51 @@ async function exportMessagesToExcel() {
     throw err;
   }
 }
+
+function toHebrewDate(date) {
+  return new Intl.DateTimeFormat("he-IL-u-ca-hebrew", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  })
+    .format(new Date(date))
+    .replace(/\d+/g, (day) => {
+      const hebrewDays = [
+        "א",
+        "ב",
+        "ג",
+        "ד",
+        "ה",
+        "ו",
+        "ז",
+        "ח",
+        "ט",
+        "י",
+        "יא",
+        "יב",
+        "יג",
+        "יד",
+        "טו",
+        "טז",
+        "יז",
+        "יח",
+        "יט",
+        "כ",
+        "כא",
+        "כב",
+        "כג",
+        "כד",
+        "כה",
+        "כו",
+        "כז",
+        "כח",
+        "כט",
+        "ל",
+      ];
+      return hebrewDays[day - 1];
+    });
+}
+
 
 module.exports = {
   getAllMaessages,

@@ -1,5 +1,8 @@
 const {Router} = require('express');
 const { getAllMaessages, createMessage, updateMessage, deleteMessage, getMessageById, exportMessagesToExcel } = require('../Services/messages.services');
+const fs = require('fs');
+const path = require('path');
+const { log } = require('console');
 const router = Router();
 
 router.get('/', async (req, res) => {
@@ -45,16 +48,38 @@ router.get('/:id', async (req, res) => {
 });
 
 
-
 router.post('/', async (req, res) => {
+  console.log("POST /messages", req.body);
   try {
-    const  message  = req.body;
+    const  message = req.body;
+
+    if (message.image_path) {
+      const imageBuffer = fs.readFileSync(image_path);
+      const imageName = path.basename(image_path);
+      const destinationPath = path.join(__dirname, '../../public/images', imageName);
+
+      fs.writeFileSync(destinationPath, imageBuffer);
+
+      message.image_path = `/public/images/${imageName}`;
+    }
+
     const newMessage = await createMessage(message);
     res.status(201).json(newMessage);
   } catch (error) {
+    console.log(error);
+    
     res.status(500).json({ error: error.message });
   }
 });
+// router.post('/', async (req, res) => {
+//   try {
+//     const  message  = req.body;
+//     const newMessage = await createMessage(message);
+//     res.status(201).json(newMessage);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
 router.delete('/:id', async (req, res) => {
   try {

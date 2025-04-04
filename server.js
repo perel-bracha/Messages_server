@@ -14,6 +14,7 @@ const io = socketIo(server, {
 app.use(cors());
 app.use(express.json()); // מאפשר שליחת JSON בבקשות
 app.use("/public/backgrounds", express.static("public/backgrounds"));
+app.use("/public/images", express.static("public/images"));
 
 app.use("/backgrounds", require("./src/API/backgrounds.routes"));
 app.use("/majors", require("./src/API/majors.routes"));
