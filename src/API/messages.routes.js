@@ -2,8 +2,20 @@ const {Router} = require('express');
 const { getAllMaessages, createMessage, updateMessage, deleteMessage, getMessageById, exportMessagesToExcel } = require('../Services/messages.services');
 const fs = require('fs');
 const path = require('path');
-const { log } = require('console');
+const multer = require('multer');
 const router = Router();
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../../public/images')); // יעד הקובץ
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // שם קובץ ייחודי
+  }
+});
+
+const upload = multer({ storage: storage });
+
 
 router.get('/', async (req, res) => {
   try {
@@ -48,26 +60,20 @@ router.get('/:id', async (req, res) => {
 });
 
 
-router.post('/', async (req, res) => {
+router.post('/', upload.single('image_path'), async (req, res) => {
   console.log("POST /messages", req.body);
   try {
     const  message = req.body;
 
-    if (message.image_path) {
-      const imageBuffer = fs.readFileSync(image_path);
-      const imageName = path.basename(image_path);
-      const destinationPath = path.join(__dirname, '../../public/images', imageName);
-
-      fs.writeFileSync(destinationPath, imageBuffer);
-
-      message.image_path = `/public/images/${imageName}`;
+    if (req.file) {
+      message.image_path = `/public/images/${req.file.filename}`;
+      console.log(`after image_path`, message);
     }
 
     const newMessage = await createMessage(message);
     res.status(201).json(newMessage);
   } catch (error) {
     console.log(error);
-    
     res.status(500).json({ error: error.message });
   }
 });
