@@ -3,6 +3,8 @@ const { getAllMaessages, createMessage, updateMessage, deleteMessage, getMessage
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
+const { log } = require('console');
+const { ok } = require('assert');
 const router = Router();
 
 const storage = multer.diskStorage({
@@ -95,9 +97,16 @@ router.post('/upload_image', upload.single('image_path'), async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(`Deleting message with id: ${id}`);
     await deleteMessage(id);
-    res.status(204).send();
+    console.log(`Message with id: ${id} deleted successfully`);
+    
+    res.status(200).json( 'Message deleted successfully');
+    
+    // res.status(204).send();
   } catch (error) {
+    console.log(`Error deleting message with id: ${id}`, error);
+    
     res.status(500).json({ error: error.message });
   }
 });

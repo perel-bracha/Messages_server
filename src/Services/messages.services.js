@@ -1,10 +1,13 @@
 const pool = require("../DB/db");
 const ExcelJS = require("exceljs");
+const e = require("express");
 var path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "../../.env") }); // בדיקת טעינת המשתנים הסביבתיים
 
 // בעיית הlocalhost
 const getQuery = `SELECT 
+    m.message_id,
+    m.major_id,
     m.message_text, 
     m.study_year_id, 
     sy.study_year_name, 
@@ -22,7 +25,6 @@ const getQuery = `SELECT
 //השיטה היא להחזיר נתיב ולגשת
 
 async function getAllMaessages() {
-  console.log("URL:", process.env.URL);
   try {
     const result = await pool.query(`${getQuery} ORDER BY message_date DESC;`);
     return result[0];
@@ -94,9 +96,11 @@ async function updateMessage(id, message) {
 
 async function deleteMessage(id) {
   try {
-    const result = await pool.query("DELETE FROM messages WHERE id = ?", [id]);
-    return result.rows[0];
+    console.log("DELETE FROM messages WHERE id = ?", [id]);
+    const result = await pool.query("DELETE FROM messages WHERE message_id = ?", [id]);
+    return;
   } catch (err) {
+    console.log(err);
     throw err;
   }
 }
