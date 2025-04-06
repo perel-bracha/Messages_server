@@ -1,6 +1,6 @@
 var path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "../../.env") }); // בדיקת טעינת המשתנים הסביבתיים
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const adminUsername = process.env.ADMIN_USERNAME;
 const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
