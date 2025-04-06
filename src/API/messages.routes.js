@@ -63,7 +63,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', upload.single('image_path'), async (req, res) => {
   console.log("POST /messages", req.body);
   try {
-    const  message = req.body;
+    const  {message} = req.body;
 
     if (req.file) {
       message.image_path = `/public/images/${req.file.filename}`;

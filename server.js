@@ -20,6 +20,7 @@ app.use("/backgrounds", require("./src/API/backgrounds.routes"));
 app.use("/majors", require("./src/API/majors.routes"));
 app.use("/study_years", require("./src/API/study_years.routes"));
 app.use("/messages", require("./src/API/messages.routes"));//(io)
+app.use('/login', require('./src/API/login.routes'));
 
 io.on("connection", (socket) => {
   console.log(`לקוח מחובר ${socket.id}`);
