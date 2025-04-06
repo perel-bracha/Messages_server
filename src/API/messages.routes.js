@@ -8,9 +8,10 @@ const router = Router();
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, '../../public/images')); // יעד הקובץ
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // שם קובץ ייחודי
+    },
+    filename: (req, file, cb) => {
+    cb(null, file.originalname); // שמירת הקובץ בשם המקורי שלו
+    // cb(null, Date.now() + path.extname(file.originalname)); // שם קובץ ייחודי
   }
 });
 
@@ -60,10 +61,10 @@ router.get('/:id', async (req, res) => {
 });
 
 
-router.post('/', upload.single('image_path'), async (req, res) => {
+router.post('/', async (req, res) => {
   console.log("POST /messages", req.body);
   try {
-    const  {message} = req.body;
+    const  message = req.body;
 
     if (req.file) {
       message.image_path = `/public/images/${req.file.filename}`;
@@ -76,6 +77,10 @@ router.post('/', upload.single('image_path'), async (req, res) => {
     console.log(error);
     res.status(500).json({ error: error.message });
   }
+});
+router.post('/upload_image', upload.single('image_path'), async (req, res) => {
+  console.log("POST /messages/upload", req.body);
+  res.status(201).json(`uploaded ${req.file.filename}`);
 });
 // router.post('/', async (req, res) => {
 //   try {
