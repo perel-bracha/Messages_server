@@ -85,10 +85,12 @@ async function createMessage(message) {
 async function updateMessage(id, message) {
   try {
     const result = await pool.query(
-      "UPDATE messages SET message = ? WHERE id = ?",
+      "UPDATE messages SET ? WHERE message_id = ?",
       [message, id]
     );
-    return result.rows[0];
+    console.log();
+    
+    return result[0];
   } catch (err) {
     throw err;
   }

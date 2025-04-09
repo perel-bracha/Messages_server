@@ -10,8 +10,7 @@ const {
 const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
-const { log } = require("console");
-const { ok } = require("assert");
+const e = require("express");
 const router = Router();
 
 module.exports = (io) => {
@@ -121,15 +120,19 @@ module.exports = (io) => {
   });
 
   router.put("/:id", async (req, res) => {
+    console.log("PUT /messages", req.body);
+    
     try {
       const { id } = req.params;
-      const { message } = req.body;
+      const  message  = req.body;
       const updatedMessage = await updateMessage(id, message);
       // שליחת אירוע ללקוח על עדכון הודעה
       io.emit("message_event", { event: "update", data: { id, message } });
 
       res.json(updatedMessage);
     } catch (error) {
+      console.log(error);
+      
       res.status(500).json({ error: error.message });
     }
   });
