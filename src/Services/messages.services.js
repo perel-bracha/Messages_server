@@ -8,6 +8,7 @@ require("dotenv").config({ path: path.resolve(__dirname, "../../.env") }); // ב
 const getQuery = `SELECT 
     m.message_id,
     m.major_id,
+    b.background_id,
     m.message_text, 
     m.study_year_id, 
     sy.study_year_name, 
