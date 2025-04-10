@@ -28,18 +28,21 @@ module.exports = (io) => {
 
   router.get("/", async (req, res) => {
     try {
-      const messages = await getAllMaessages();
+      const filters = req.query; // קבלת פרמטרים לסינון מהבקשה
+      const messages = await getAllMaessages(filters);
       res.json(messages);
     } catch (error) {
+      console.error(error);
       res.status(500).json({ error: error.message });
     }
   });
 
   router.get("/export", async (req, res) => {
     console.log("export route");
+    const filters = req.query; // קבלת פרמטרים לסינון מהבקשה
 
     try {
-      const excelBuffer = await exportMessagesToExcel();
+      const excelBuffer = await exportMessagesToExcel(filters);
       res.setHeader(
         "Content-Type",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -121,10 +124,10 @@ module.exports = (io) => {
 
   router.put("/:id", async (req, res) => {
     console.log("PUT /messages", req.body);
-    
+
     try {
       const { id } = req.params;
-      const  message  = req.body;
+      const message = req.body;
       const updatedMessage = await updateMessage(id, message);
       // שליחת אירוע ללקוח על עדכון הודעה
       io.emit("message_event", { event: "update", data: { id, message } });
@@ -132,7 +135,7 @@ module.exports = (io) => {
       res.json(updatedMessage);
     } catch (error) {
       console.log(error);
-      
+
       res.status(500).json({ error: error.message });
     }
   });

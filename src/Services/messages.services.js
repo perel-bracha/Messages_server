@@ -22,12 +22,55 @@ const getQuery = `SELECT
     LEFT JOIN majors mj ON m.major_id = mj.major_id
     LEFT JOIN study_years sy ON m.study_year_id = sy.study_year_id`;
 
-//השיטה היא להחזיר נתיב ולגשת
 
-async function getAllMaessages() {
+
+
+async function getAllMaessages(filters = {}) {
   try {
-    const result = await pool.query(`${getQuery} ORDER BY message_date DESC;`);
-    return result[0];
+    let query = `${getQuery} WHERE 1=1`; // בסיס השאילתה
+    const params = [];
+
+    // סינון לפי תאריך ההודעה
+    if (filters.message_start_date) {
+      query += " AND m.message_date >= ?";
+      params.push(filters.message_start_date);
+    }
+    if (filters.message_end_date) {
+      query += " AND m.message_date <= ?";
+      params.push(filters.message_end_date);
+    }
+
+    // סינון לפי תאריך יעד
+    if (filters.destination_start_date) {
+      query += " AND m.destination_date >= ?";
+      params.push(filters.destination_start_date);
+    }
+    if (filters.destination_end_date) {
+      query += " AND m.destination_date <= ?";
+      params.push(filters.destination_end_date);
+    }
+
+    // סינון לפי טקסט מגמה
+    if (filters.major_name) {
+      query += " AND mj.major_name LIKE ?";
+      params.push(`%${filters.major_name}%`);
+    }
+
+    // סינון לפי שנת לימודים
+    if (filters.study_year_name) {
+      query += " AND sy.study_year_name LIKE ?";
+      params.push(`%${filters.study_year_name}%`);
+    }
+
+    // סינון לפי טקסט ההודעה
+    if (filters.message_text) {
+      query += " AND m.message_text LIKE ?";
+      params.push(`%${filters.message_text}%`);
+    }
+
+    // ביצוע השאילתה
+    const [result] = await pool.query(query, params);
+    return result;
   } catch (err) {
     throw err;
   }
@@ -107,9 +150,9 @@ async function deleteMessage(id) {
   }
 }
 
-async function exportMessagesToExcel() {
+async function exportMessagesToExcel(filters) {
   try {
-    const messages = await getAllMaessages(); // קבלת כל ההודעות
+    const messages = await getAllMaessages(filters); // קבלת כל ההודעות
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Messages");
 
