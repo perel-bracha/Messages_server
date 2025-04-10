@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
   }
 
   // יצירת טוקן עם שם המשתמש וחותמת זמן
-  const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '2h' });
+  const token = jwt.sign({ username }, JWT_SECRET);
 
   res.json({ success: true, token });
 });
