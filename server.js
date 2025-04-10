@@ -9,7 +9,9 @@ require("dotenv").config({ path: path.resolve(__dirname, "../../.env") }); // ב
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
-  cors: { origin: "*" }, // מאפשר חיבורים מכל מקום
+  cors: { 
+    origin: ["https://messages-app-zeta.vercel.app/", "http://localhost:3000"], // מאפשר חיבורים משתי כתובות ספציפיות
+  },
 });
 app.use(cors());
 app.use(express.json()); // מאפשר שליחת JSON בבקשות
