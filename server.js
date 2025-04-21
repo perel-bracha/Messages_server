@@ -11,14 +11,14 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: ["https://messages-app-zeta.vercel.app", "http://localhost:3000"], // הכתובות המותרות
-    methods: ["GET", "POST"], // שיטות HTTP המותרות
+    methods: ["GET", "POST", "PUT", "DELETE"], // שיטות HTTP המותרות
     credentials: true, // מאפשר שליחת עוגיות (אם נדרש)
   },
 });
 app.use(
   cors({
     origin: ["https://messages-app-zeta.vercel.app", "http://localhost:3000"], // הכתובות המותרות
-    methods: ["GET", "POST"], // שיטות HTTP המותרות
+    methods: ["GET", "POST", "PUT", "DELETE"], // שיטות HTTP המותרות
     credentials: true, // מאפשר שליחת עוגיות (אם נדרש)
   })
 );app.use(express.json()); // מאפשר שליחת JSON בבקשות
