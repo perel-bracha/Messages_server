@@ -24,7 +24,7 @@ const getQuery = `SELECT
     LEFT JOIN study_years sy ON m.study_year_id = sy.study_year_id`;
 
 
-
+    const getSortedQuery = `${getQuery} ORDER BY m.message_date DESC`;
 
 async function getAllMaessages(filters = {}) {
   try {
@@ -68,9 +68,10 @@ async function getAllMaessages(filters = {}) {
       query += " AND m.message_text LIKE ?";
       params.push(`%${filters.message_text}%`);
     }
+    const getSortedQuery = `${query} ORDER BY m.message_date DESC`;
 
     // ביצוע השאילתה
-    const [result] = await pool.query(query, params);
+    const [result] = await pool.query(getSortedQuery, params);
     return result;
   } catch (err) {
     throw err;
