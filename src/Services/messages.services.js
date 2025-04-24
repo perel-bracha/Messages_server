@@ -13,6 +13,7 @@ const getQuery = `SELECT
     m.study_year_id, 
     sy.study_year_name, 
     m.destination_date, 
+    m.author_name,
     m.message_date, 
     mj.major_name,      
     CONCAT('${process.env.URL}', m.image_path) AS image_url,
@@ -110,10 +111,11 @@ async function getMessagesRelevantByMajor(major_id) {
 async function createMessage(message) {
   try {
     const [result] = await pool.query(
-      `INSERT INTO messages (destination_date, major_id, study_year_id, message_text, image_path, background_id) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO messages (destination_date, author_name, major_id, study_year_id, message_text, image_path, background_id) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         message.destination_date,
+        message.author_name,
         message.major_id,
         message.study_year_id,
         message.message_text,
@@ -164,6 +166,7 @@ async function exportMessagesToExcel(filters) {
       { header: "תאריך עברי", key: "message_date_hebrew", width: 25 },
       { header: "תאריך יעד", key: "destination_date", width: 20 },
       { header: "תאריך יעד עברי", key: "destination_date_hebrew", width: 25 },
+      { header: "כותבת ההודעה", key: "author_name", width: 20 },
       { header: "שנת לימודים", key: "study_year_name", width: 15 },
       { header: "מגמה", key: "major_name", width: 20 },
       { header: "טקסט", key: "message_text", width: 30 },

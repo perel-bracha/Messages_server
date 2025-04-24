@@ -1,4 +1,6 @@
 const { Router } = require("express");
+const { fromPath } = require("pdf2pic");
+
 const {
   getAllMaessages,
   createMessage,
@@ -76,8 +78,30 @@ module.exports = (io) => {
     try {
       const message = req.body;
 
-      if (req.file) {
-        message.image_path = `/public/images/${req.file.filename}`;
+      if (message.image_path) {
+        
+          if (message.image_path.endsWith(".pdf") ) {
+            const filePath = path.join(__dirname, "../../public/images", message.image_path);
+console.log(`filePath`, filePath);
+
+            // המרת PDF לתמונה
+            const pdfToImage = fromPath(filePath, {
+              density: 300, // איכות התמונה
+              saveFilename: `${Date.now()}_converted`,
+              savePath: path.join(__dirname, "../../public/images"),
+              format: "png", // פורמט התמונה
+            });
+    
+            const conversionResult = await pdfToImage(1); // המרת העמוד הראשון בלבד
+            console.log("PDF converted to image:", conversionResult);
+    
+            // עדכון הנתיב של התמונה החדשה
+            message.image_path = `/public/images/${conversionResult.name}`;
+          } else {
+            // אם זה לא PDF, שמור את הנתיב המקורי
+            message.image_path = `/public/images${message.image_path}`;
+          
+        }
         console.log(`after image_path`, message);
       }
 
@@ -96,7 +120,8 @@ module.exports = (io) => {
     upload.single("image_path"),
     async (req, res) => {
       console.log("POST /messages/upload", req.body);
-      const filePath = `/public/images/${req.file.filename}`;
+      let filePath=`/${req.file.filename}`
+      
       res.status(201).json({ filePath });
     }
   );
