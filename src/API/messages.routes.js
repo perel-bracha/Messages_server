@@ -1,5 +1,8 @@
 const { Router } = require("express");
-const { fromPath } = require("pdf2pic");
+// const { fromPath } = require("pdf2pic");
+const { convert } = require('pdf-poppler');
+
+const fs = require("fs");
 
 const {
   getAllMaessages,
@@ -9,7 +12,6 @@ const {
   getMessageById,
   exportMessagesToExcel,
 } = require("../Services/messages.services");
-const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
 const e = require("express");
@@ -78,30 +80,8 @@ module.exports = (io) => {
     try {
       const message = req.body;
 
-      if (message.image_path) {
-        
-          if (message.image_path.endsWith(".pdf") ) {
-            const filePath = path.join(__dirname, "../../public/images", message.image_path);
-console.log(`filePath`, filePath);
-
-            // המרת PDF לתמונה
-            const pdfToImage = fromPath(filePath, {
-              density: 300, // איכות התמונה
-              saveFilename: `${Date.now()}_converted`,
-              savePath: path.join(__dirname, "../../public/images"),
-              format: "png", // פורמט התמונה
-            });
-    
-            const conversionResult = await pdfToImage(1); // המרת העמוד הראשון בלבד
-            console.log("PDF converted to image:", conversionResult);
-    
-            // עדכון הנתיב של התמונה החדשה
-            message.image_path = `/public/images/${conversionResult.name}`;
-          } else {
-            // אם זה לא PDF, שמור את הנתיב המקורי
-            message.image_path = `/public/images${message.image_path}`;
-          
-        }
+      if (req.file) {
+        message.image_path = `/public/images/${req.file.filename}`;
         console.log(`after image_path`, message);
       }
 
@@ -120,11 +100,74 @@ console.log(`filePath`, filePath);
     upload.single("image_path"),
     async (req, res) => {
       console.log("POST /messages/upload", req.body);
-      let filePath=`/${req.file.filename}`
-      
+      const filePath = `/public/images/${req.file.filename}`;
       res.status(201).json({ filePath });
     }
   );
+
+
+  // router.post("/", async (req, res) => {
+  //   console.log("POST /messages", req.body);
+  //   try {
+  //     const message = req.body;
+
+  //     if (message.image_path) {
+  //       if (message.image_path.endsWith(".pdf")) {
+  //         const filePath = path.join(
+  //           __dirname,
+  //           "../../public/images",
+  //           message.image_path
+  //         );
+  //         console.log(`filePath`, filePath);
+  //         console.log(`savePath`, path.join(__dirname, "../../public/images"));
+  //         const outputDir = path.join(__dirname, "../../public/images");
+  //         if (!fs.existsSync(outputDir)) {
+  //           fs.mkdirSync(outputDir, { recursive: true });
+  //         }
+  //         if (!fs.existsSync(filePath)) {
+  //           console.error("קובץ PDF לא נמצא:", filePath);
+  //         }
+          
+  //         // המרת PDF לתמונה
+  //         const pdfToPic = fromPath(filePath, {
+  //           density: 300, // איכות התמונה
+  //           saveFilename: `${Date.now()}_converted`,
+  //           savePath: outputDir,
+  //           format: "png", // פורמט התמונה
+  //         });
+  //         const conversionResult = await pdfToImage(1); // המרת העמוד הראשון בלבד
+  //         console.log("PDF converted to image:", conversionResult);
+  //         message.image_path = `/public/images/${conversionResult.name}`;
+
+          
+  //         // עדכון הנתיב של התמונה החדשה
+  //       } else {
+  //         // אם זה לא PDF, שמור את הנתיב המקורי
+  //         message.image_path = `/public/images${message.image_path}`;
+  //       }
+  //       console.log(`after image_path`, message);
+  //     }
+
+  //     const newMessage = await createMessage(message);
+  //     // שליחת אירוע ללקוח על הוספת הודעה
+  //     io.emit("message_event", { event: "create", data: newMessage });
+
+  //     res.status(201).json(newMessage);
+  //   } catch (error) {
+  //     console.log(error);
+  //     res.status(500).json({ error: error.message });
+  //   }
+  // });
+  // router.post(
+  //   "/upload_image",
+  //   upload.single("image_path"),
+  //   async (req, res) => {
+  //     console.log("POST /messages/upload", req.body);
+  //     let filePath = `/${req.file.filename}`;
+
+  //     res.status(201).json({ filePath });
+  //   }
+  // );
 
   router.delete("/:id", async (req, res) => {
     try {

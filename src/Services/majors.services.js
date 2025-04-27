@@ -49,17 +49,20 @@ async function getScreenMajors(screenNum) {
     case 1:
       start = 2;
       finish = 6;
-      ids=[12,13,15,16,20]
+      ids = [12, 13, 15, 16, 20];
       break;
     case 2:
       start = 7;
       finish = 11;
-      ids=[14,17,18,19,21]
+      ids = [14, 17, 18, 19, 21];
       break;
     case 3:
       start = 1;
       finish = 1;
-      ids=[1]
+      ids = [1];
+      break;
+    case 4:
+      ids = [100];
       break;
     default:
       throw new Error("Invalid screen number");
