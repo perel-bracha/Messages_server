@@ -11,7 +11,8 @@ const getQuery = `SELECT
     b.background_id,
     m.message_text, 
     m.study_year_id, 
-    sy.study_year_name, 
+    sy.study_year_name,
+    m.from_date, 
     m.destination_date, 
     m.author_name,
     m.message_date, 
@@ -24,8 +25,7 @@ const getQuery = `SELECT
     LEFT JOIN majors mj ON m.major_id = mj.major_id
     LEFT JOIN study_years sy ON m.study_year_id = sy.study_year_id`;
 
-
-    const getSortedQuery = `${getQuery} ORDER BY m.message_date DESC`;
+const getSortedQuery = `${getQuery} ORDER BY m.message_date DESC`;
 
 async function getAllMaessages(filters = {}) {
   try {
@@ -40,6 +40,16 @@ async function getAllMaessages(filters = {}) {
     if (filters.message_end_date) {
       query += " AND m.message_date <= ?";
       params.push(filters.message_end_date);
+    }
+
+    // סינון לפי תאריך התחלה
+    if (filters.from_start_date) {
+      query += " AND m.from_date >= ?";
+      params.push(filters.from_start_date);
+    }
+    if (filters.from_end_date) {
+      query += " AND m.from_date <= ?";
+      params.push(filters.from_end_date);
     }
 
     // סינון לפי תאריך יעד
@@ -88,10 +98,9 @@ async function getMessageById(id) {
 }
 async function getMessagesByMajor(major_id) {
   try {
-    const result = await pool.query(
-      `${getQuery} WHERE m.major_id = ?`,
-      [major_id]
-    );
+    const result = await pool.query(`${getQuery} WHERE m.major_id = ?`, [
+      major_id,
+    ]);
     return result[0];
   } catch (err) {
     throw err;
@@ -100,7 +109,7 @@ async function getMessagesByMajor(major_id) {
 async function getMessagesRelevantByMajor(major_id) {
   try {
     const result = await pool.query(
-      `${getQuery} WHERE m.major_id = ? AND m.destination_date >= CURDATE()`,
+      `${getQuery} WHERE m.major_id = ? AND m.destination_date >= CURDATE() AND m.from_date <= CURDATE()`,
       [major_id]
     );
     return result[0];
@@ -111,9 +120,10 @@ async function getMessagesRelevantByMajor(major_id) {
 async function createMessage(message) {
   try {
     const [result] = await pool.query(
-      `INSERT INTO messages (destination_date, author_name, major_id, study_year_id, message_text, image_path, background_id) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO messages (from_date, destination_date, author_name, major_id, study_year_id, message_text, image_path, background_id) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        message.from_date,
         message.destination_date,
         message.author_name,
         message.major_id,
@@ -136,7 +146,7 @@ async function updateMessage(id, message) {
       [message, id]
     );
     console.log();
-    
+
     return result[0];
   } catch (err) {
     throw err;
@@ -146,7 +156,10 @@ async function updateMessage(id, message) {
 async function deleteMessage(id) {
   try {
     console.log("DELETE FROM messages WHERE id = ?", [id]);
-    const result = await pool.query("DELETE FROM messages WHERE message_id = ?", [id]);
+    const result = await pool.query(
+      "DELETE FROM messages WHERE message_id = ?",
+      [id]
+    );
     return;
   } catch (err) {
     console.log(err);
@@ -164,6 +177,8 @@ async function exportMessagesToExcel(filters) {
     worksheet.columns = [
       { header: "תאריך", key: "message_date", width: 20 },
       { header: "תאריך עברי", key: "message_date_hebrew", width: 25 },
+      { header: "תאריך התחלה", key: "from_date", width: 20 },
+      { header: "תאריך התחלה עברי", key: "from_date_hebrew", width: 25 },
       { header: "תאריך יעד", key: "destination_date", width: 20 },
       { header: "תאריך יעד עברי", key: "destination_date_hebrew", width: 25 },
       { header: "כותבת ההודעה", key: "author_name", width: 20 },
@@ -175,8 +190,10 @@ async function exportMessagesToExcel(filters) {
 
     // הוספת תאריך עברי לכל הודעה
     messages.forEach((message) => {
+      const fromDate = new Date(message.from_date);
       const destinationDate = new Date(message.destination_date);
       const messageDate = new Date(message.message_date);
+      message.from_date_hebrew = toHebrewDate(fromDate);
       message.destination_date_hebrew = toHebrewDate(destinationDate);
       message.message_date_hebrew = toHebrewDate(messageDate);
     });
@@ -237,7 +254,6 @@ function toHebrewDate(date) {
       return hebrewDays[day - 1];
     });
 }
-
 
 module.exports = {
   getAllMaessages,
