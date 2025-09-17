@@ -2,7 +2,7 @@ const pool = require("../DB/db");
 
 async function getAllMajors() {
   try {
-    const result = await pool.query("SELECT * FROM majors WHERE major_id != ?", [20]);
+    const result = await pool.query("SELECT * FROM majors);
     return result[0];
   } catch (err) {
     throw err;
@@ -49,7 +49,7 @@ async function getScreenMajors(screenNum) {
     case 1:
       start = 2;
       finish = 6;
-      ids = [12, 13, 15, 16, 21];
+      ids = [12, 13, 15, 16, 20];
       break;
     case 2:
       start = 7;
